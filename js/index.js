@@ -1,37 +1,56 @@
+// Coding Rainbow
+// Daniel Shiffman
+// http://patreon.com/codingrainbow
+// Code for: https://youtu.be/fcdNSZ9IzJM
+
 var tree = [];
+var leaves = [];
+
+var count = 0;
 
 function setup() {
-  createCanvas(400,400);
-  var a = createVector( width/2, height);
-  var b = createVector( width/2, height-100);
+  createCanvas(400, 400);
+  var a = createVector(width / 2, height);
+  var b = createVector(width / 2, height - 100);
   var root = new Branch(a, b);
+
   tree[0] = root;
-  
-  var newBranch = root.branch();
-  tree[1] = newBranch;
+}
+
+function mousePressed() {
+  for (var i = tree.length - 1; i >= 0; i--) {
+    if (!tree[i].finished) {
+      tree.push(tree[i].branchA());
+      tree.push(tree[i].branchB());
+    }
+    tree[i].finished = true;
+  }
+  count++;
+
+  if (count === 6) {
+    for (var i = 0; i < tree.length; i++) {
+      if (!tree[i].finished) {
+        var leaf = tree[i].end.copy();
+        leaves.push(leaf);
+      }
+    }
+  }
+
 }
 
 function draw() {
-  background(51);  
-  for(var i = 0; i < tree.length; i++) {
-    tree[i].show();
-  }
-}
+  background(51);
 
-function Branch(begin,end) {
-  this.begin = begin;
-  this.end = end;
-  
-  this.show = function() {
-    stroke(255);
-    line(this.begin.x, this.begin.y, this.end.x, this.end.y);
+  for (var i = 0; i < tree.length; i++) {
+    tree[i].show();
+    //tree[i].jitter();
   }
-  
-  this.branch = function() {
-    var dir = p5.Vector.sub(this.end, this.begin);
-    dir.rotate(PI / 4);
-    var newEnd = p5.Vector.add(this.end, dir);
-    var right = new Branch(this.end, newEnd);
-    return right;
+
+  for (var i = 0; i < leaves.length; i++) {
+    fill(255, 0, 100, 100);
+    noStroke();
+    ellipse(leaves[i].x, leaves[i].y, 8, 8);
+    leaves[i].y += random(0, 2);
   }
+
 }
